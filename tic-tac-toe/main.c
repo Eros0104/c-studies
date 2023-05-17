@@ -26,10 +26,12 @@ void red();
 void yellow();
 void green();
 void reset_color();
-int check_game_over(int current_player, int turn);
+int check_game_over(
+  int current_player, int turn, struct board_coordinate coordinates
+);
 bool is_diagonal_complete();
 bool is_vertical_complete();
-bool is_horizontal_complete();
+bool is_horizontal_complete(int y, int current_player);
 struct board_coordinate get_board_coordinate(char value);
 
 int main() {
@@ -42,7 +44,6 @@ int main() {
  
   clear_screen();
   draw_board();
-
   do {
     printf("Player %d turn. Enter a number: ", current_player);
     // space inserted before "%c" to consume newline from previous run 
@@ -55,11 +56,12 @@ int main() {
       
       board_values[coordinates.i][coordinates.j] = current_player == 1 ? 'x' : 'o';
       
-      game_over = check_game_over(current_player, turn); 
+      game_over = check_game_over(current_player, turn, coordinates); 
     
       turn = turn + 1;
 
-      current_player = (current_player % 2) ? 2 : 1;
+      if (game_over == GAME_IS_NOT_OVER)
+        current_player = (current_player % 2) ? 2 : 1;
 
       clear_screen();
     } else {
@@ -71,7 +73,7 @@ int main() {
 
     draw_board();
 
-  } while (game_over == GAME_IS_NOT_OVER);
+  } while (game_over == GAME_IS_NOT_OVER); 
   
   if (game_over == DRAW) {
     yellow();
@@ -114,18 +116,31 @@ bool is_vertical_complete() {
   return false;
 }
 
-bool is_horizontal_complete() {
-  // implement logic
+bool is_horizontal_complete(int x, int current_player) {
+  char value = current_player == 1 ? 'x' : 'o';
+  for(int i = 0; i < 3; i++) {
+    if(board_values[x][i] != value) {
+      break;
+    }
+    if(i == 2) {
+      return true;
+    }
+  }
   return false;
 }
 
-int check_game_over(int current_player, int turn) {
+int check_game_over(
+  int current_player, int turn, struct board_coordinate coordinate
+) {
   if (turn == 9) {
     return DRAW;
   }
 
-  
-  if (is_horizontal_complete() || is_vertical_complete() || is_diagonal_complete()) {
+  if (
+    is_horizontal_complete(coordinate.i, current_player)
+    || is_vertical_complete() 
+    || is_diagonal_complete()
+  ) {
     return PLAYER_WIN;
   }
 
@@ -148,7 +163,7 @@ void draw_connect_line() {
   printf("---+---+---\n");
 }
 
-void draw_board() {
+void draw_board(int i) {
   printf("\n");
     
   for(int i = 0; i < 3; i++) {
