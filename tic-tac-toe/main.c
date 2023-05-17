@@ -46,11 +46,12 @@ int main() {
       current_player = (current_player % 2) ? 2 : 1;
 
       clear_screen();
-      draw_board();
     } else {
       clear_screen();
       printf("Invalid move!");
     }
+
+    draw_board();
 
   } while (game_over == GAME_IS_NOT_OVER);
   
