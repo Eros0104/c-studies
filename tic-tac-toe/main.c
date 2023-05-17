@@ -6,18 +6,31 @@
 #define PLAYER_WIN 1
 #define GAME_IS_NOT_OVER -1
 
-char board_values[10] = {'1','2','3','4','5','6','7','8','9'};
+char board_values[3][3] = {
+  {'1', '2', '3'},
+  {'4', '5', '6'},
+  {'7', '8', '9'},
+};
+
+struct board_coordinate {
+  int i;
+  int j;
+};
 
 void draw_board();
 void draw_connect_line();
 void draw_line(char a, char b, char c);
 void draw_empty_line();
 void clear_screen();
-int check_game_over(int board_index, int current_player, int turn);
+void red();
+void yellow();
+void green();
+void reset_color();
+int check_game_over(int current_player, int turn);
 bool is_diagonal_complete();
 bool is_vertical_complete();
 bool is_horizontal_complete();
-
+struct board_coordinate get_board_coordinate(char value);
 
 int main() {
   int current_player = 1;
@@ -32,14 +45,17 @@ int main() {
 
   do {
     printf("Player %d turn. Enter a number: ", current_player);
-    scanf("%d", &input);
-    int board_index = input - 1;  
+    // space inserted before "%c" to consume newline from previous run 
+    scanf(" %c", &input);
 
-    if (isdigit(board_values[board_index]) && board_index <= 9) {
+    struct board_coordinate coordinates = get_board_coordinate(input);  
+    
+    printf("%d", coordinates.i);
+    if (coordinates.i != -1) {
       
-      board_values[board_index] = current_player == 1 ? 'x' : 'o';
+      board_values[coordinates.i][coordinates.j] = current_player == 1 ? 'x' : 'o';
       
-      game_over = check_game_over(board_index, current_player, turn); 
+      game_over = check_game_over(current_player, turn); 
     
       turn = turn + 1;
 
@@ -48,7 +64,9 @@ int main() {
       clear_screen();
     } else {
       clear_screen();
+      red();
       printf("Invalid move!");
+      reset_color();
     }
 
     draw_board();
@@ -56,12 +74,30 @@ int main() {
   } while (game_over == GAME_IS_NOT_OVER);
   
   if (game_over == DRAW) {
+    yellow();
     printf("Draw!");
   } else {
+    green();
     printf("Player %d won!", current_player);
   }
 
   return 0;
+}
+
+struct board_coordinate get_board_coordinate (char value) {
+  int i, j;
+  struct board_coordinate result = { -1, -1 };
+
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      if (board_values[i][j] == value) {
+        result.i = i;
+	result.j = j;
+      }
+    }
+  }
+
+  return result;
 }
 
 bool is_even(int board_index) {
@@ -83,14 +119,15 @@ bool is_horizontal_complete() {
   return false;
 }
 
-int check_game_over(int board_index, int current_player, int turn) {
+int check_game_over(int current_player, int turn) {
   if (turn == 9) {
     return DRAW;
   }
 
-  // checks if diagonal is complete
-  // check vertical
-  // check horizontal
+  
+  if (is_horizontal_complete() || is_vertical_complete() || is_diagonal_complete()) {
+    return PLAYER_WIN;
+  }
 
   return GAME_IS_NOT_OVER;
 }
@@ -113,15 +150,28 @@ void draw_connect_line() {
 
 void draw_board() {
   printf("\n");
-  draw_empty_line();
-  draw_line(board_values[0], board_values[1], board_values[2]);
-  draw_empty_line();
-  draw_connect_line();
-  draw_empty_line();
-  draw_line(board_values[3], board_values[4], board_values[5]);
-  draw_empty_line();
-  draw_connect_line();
-  draw_empty_line();
-  draw_line(board_values[6], board_values[7], board_values[8]);
-  draw_empty_line();
+    
+  for(int i = 0; i < 3; i++) {
+    draw_empty_line();
+    draw_line(board_values[i][0], board_values[i][1], board_values[i][2]);
+    draw_empty_line();
+    if (i < 2)
+     draw_connect_line();
+  }
+}
+
+void reset_color() {
+  printf("\033[0m");
+}
+
+void red() {
+  printf("\033[1;31m");
+}
+
+void green() {
+  printf("\033[0;32m");
+}
+
+void yellow() {
+  printf("\033[1;33m");
 }
