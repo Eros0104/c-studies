@@ -34,7 +34,7 @@ struct board_coordinate get_board_coordinate(char value);
 
 int main() {
   int current_player = 1;
-  int input;
+  char input;
   int turn = 1;
   int game_over = GAME_IS_NOT_OVER;
 
@@ -51,7 +51,7 @@ int main() {
     struct board_coordinate coordinates = get_board_coordinate(input);  
     
     printf("%d", coordinates.i);
-    if (coordinates.i != -1) {
+    if (coordinates.i != -1 && isdigit(board_values[coordinates.i][coordinates.j])) {
       
       board_values[coordinates.i][coordinates.j] = current_player == 1 ? 'x' : 'o';
       
