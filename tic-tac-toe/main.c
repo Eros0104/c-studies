@@ -83,6 +83,11 @@ int main() {
     green();
     printf("Player %d won!\n", current_player);
   }
+  
+	reset_color();
+	printf("Press \"Enter\" to exit...\n");
+	fflush(stdin);
+	getchar();
 
   return 0;
 }
