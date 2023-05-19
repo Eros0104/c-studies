@@ -69,7 +69,7 @@ int main() {
       clear_screen();
     	draw_board();
       red();
-      printf("Invalid move!");
+      printf("Invalid move!\n");
       reset_color();
     }
 
