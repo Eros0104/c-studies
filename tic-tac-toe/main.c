@@ -208,7 +208,7 @@ void draw_connect_line() {
   printf("---+---+---\n");
 }
 
-void draw_board(int i) {
+void draw_board() {
   printf("Player 1: (x) - Player 2: (o)");
   printf("\n");
     
